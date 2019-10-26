@@ -17,14 +17,14 @@ npm install
 ## Usage
 You will need to supply at minimum a NexusMods username & password, as well as a `.auto` file.
 
-| Option      	| Arg         	| Env         	| Description                                                                                                                     	| Eg.                                                                     	| Default                                        	|
-|-------------	|-------------	|-------------	|---------------------------------------------------------------------------------------------------------------------------------	|-------------------------------------------------------------------------	|------------------------------------------------	|
-| nexus_user  	| nexus_user  	| nexus_user  	| Your nexus username                                                                                                             	| Makeshift                                                               	|                                                	|
-| nexus_pass  	| nexus_pass  	| nexus_pass  	| Your nexus password                                                                                                             	| Asupersecretpassword                                                    	|                                                	|
-| autofile    	| autofile    	| autofile    	| An [Automaton](https://github.com/metherul/Automaton) `.auto` file, relative to `index.js`                                      	| ./US 4.0.6 hf 1 (Keyboard) - LD Hotfix 1.auto                           	| ./ US 4.0.6 hf 1 (Keyboard) - LD Hotfix 1.auto 	|
-| downloaddir 	| downloaddir 	| downloaddir 	| Download directory relative to `index.js`                                                                                       	| ./downloads/                                                            	| ./downloads/                                   	|
-| cookie      	| cookie      	| cookie      	| If you have an array of cookies (as outputted after finishing the login step) you can put them here to skip the login next time 	| `[{"name":"sid","value": "secret","domain":".nexusmods.com"...},{...}]` 	|                                                	|
-| log_level   	| log_level   	| log_level   	| One of `error`, `warn`, `info`, `verbose` or `debug`.                                                                           	| verbose                                                                 	| info                                           	|
+| Option      	| Description                                                                                	| Eg.                                                                     	| Default                                        	|
+|-------------	|--------------------------------------------------------------------------------------------	|-------------------------------------------------------------------------	|------------------------------------------------	|
+| nexus_user  	| Your nexus username                                                                        	| Makeshift                                                               	|                                                	|
+| nexus_pass  	| Your nexus password                                                                        	| Asupersecretpassword                                                    	|                                                	|
+| autofile    	| An [Automaton](https://github.com/metherul/Automaton) `.auto` file, relative to `index.js` 	| ./US 4.0.6 hf 1 (Keyboard) - LD Hotfix 1.auto                           	| ./ US 4.0.6 hf 1 (Keyboard) - LD Hotfix 1.auto 	|
+| downloaddir 	| Download directory relative to `index.js`                                                  	| ./downloads/                                                            	| ./downloads/                                   	|
+| cookie      	| An array of cookies used to skip login                                                     	| `[{"name":"sid","value": "secret","domain":".nexusmods.com"...},{...}]` 	|                                                	|
+| log_level   	| One of `error`, `warn`, `info`, `verbose` or `debug`.                                      	| verbose                                                                 	| info                                           	|
 
 All above can be passed in as either an environment variable or an argument to the application, eg.
 
@@ -38,6 +38,9 @@ nexus_user=makeshift
 nexus_pass=password
 node --autofile ./file.auto index.js
 ```
+
+### Skipping login
+You can skip the login step on subsequent runs by adding a `cookie` env var/arg. The cookie variable is outputted in plaintext for you after a successful login.
 
 ## Contributing
 Pull requests are welcome. This could easily be adapted to be a download manager for Nexus Mods and support other types of lists. I'd also like to get rid of the dependency on Pupeteer since it's huge, but it seemed like the easiest option at the time.

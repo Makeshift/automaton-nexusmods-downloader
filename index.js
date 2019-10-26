@@ -102,7 +102,7 @@ function pathExists(file) {
 async function checkDownloads(downloads) {
     let topLevelDownloadPath = path.resolve(__dirname, config.get("downloaddir"));
     log.verbose("Check if download directory exists", {downloadDir: topLevelDownloadPath});
-    //Remove downloads that don't have Nexus downloads
+    //Remove files that aren't on Nexus
     downloads = downloads.filter(a => a.nexus_mod_id);
     if (!await pathExists(topLevelDownloadPath)) {
         log.verbose("Download dir does not exist, not bothering to check files");
@@ -191,7 +191,7 @@ async function login() {
     await page.waitForNavigation({waitUntil: ["networkidle2", "load"], timeout: 1000 * 120});
     let cookies = await page.cookies();
     log.info("Copy these cookies and put them in an environment variable if you're going to need to start this script more than once");
-    console.log(cookies)
+    console.log(JSON.stringify(cookies))
     browser.close();
     return cookies;
 }
