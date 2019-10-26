@@ -1,0 +1,20 @@
+{
+  "name": "automaton-nexusmods-downloader",
+  "version": "1.0.0",
+  "description": "Downloads mods from NexusMods based on an Automaton express install file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Makeshift@Github",
+  "license": "ISC",
+  "dependencies": {
+    "cli-progress": "^3.3.1",
+    "colors": "^1.4.0",
+    "connor-base-config": "^3.1.3",
+    "connor-base-log": "^2.0.8",
+    "md5-file": "^4.0.0",
+    "puppeteer": "^2.0.0",
+    "unzip-stream": "^0.3.0"
+  }
+}

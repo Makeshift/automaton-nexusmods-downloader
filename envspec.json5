@@ -1,0 +1,33 @@
+{
+  nexus_user: {
+    doc: "Your NexusMods username",
+    format: "String",
+    default: "null",
+    env: "nexus_user"
+  },
+  nexus_pass: {
+    doc: "Your NexusMods password",
+    format: "String",
+    default: "null",
+    env: "nexus_pass",
+    sensitive: true
+  },
+  autofile: {
+    doc: "The auto file you wish to download the files for (relative to index.js)",
+    format: "*",
+    env: "autofile",
+    default: "US 4.0.6 hf 1 (Keyboard) - LD Hotfix 1.auto"
+  },
+  downloaddir: {
+    doc: "Where we're downloading modfiles to (relative to index.js)",
+    format: "String",
+    default: "./downloads/",
+    env: "downloaddir"
+  },
+  cookie: {
+    doc: "Skips the login step by using a provided cookie",
+    format: "*",
+    default: false,
+    env: "cookie"
+  }
+}
