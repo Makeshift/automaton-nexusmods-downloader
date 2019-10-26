@@ -102,6 +102,8 @@ function pathExists(file) {
 async function checkDownloads(downloads) {
     let topLevelDownloadPath = path.resolve(__dirname, config.get("downloaddir"));
     log.verbose("Check if download directory exists", {downloadDir: topLevelDownloadPath});
+    //Remove downloads that don't have Nexus downloads
+    downloads = downloads.filter(a => a.nexus_mod_id);
     if (!await pathExists(topLevelDownloadPath)) {
         log.verbose("Download dir does not exist, not bothering to check files");
         return downloads;
