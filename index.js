@@ -121,7 +121,7 @@ async function checkDownloads(downloads) {
             newDownloads.push(download);
         } else if (!fileValid) {
             log.verbose("File is invalid, adding to queue", {file: file});
-            newDownloads.push(download);
+            newDownloads.unshift(download);
         }
     }));
     return newDownloads;
@@ -154,25 +154,31 @@ async function downloadMods(downloads, cookies) {
     const totalBar = multibar.create((totalDownloadsSize / 1024 / 1024).toFixed(2), 0);
     let totalDownloaded = 0;
     for (let download of downloads) {
-        let downloadPage = `https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${download.nexus_file_id}&game_id=110&source=FileExpander`;
-        log.verbose("Navigating to download page", {page: downloadPage});
-        await page.goto(downloadPage, {waitUntil: 'load'});
-        log.verbose("Waiting for download link to be available");
-        await page.waitForFunction(`!!document.getElementById("dl_link")`);
-        log.verbose("Got download link element");
-        let downloadLink = await page.$eval("#dl_link", e => e.value);
-        log.verbose("Download link", {link: downloadLink});
-        let downloadPath = await downloadFile(downloadLink, download.file_name, multibar, totalBar, totalDownloaded);
-        let fileValid = await fileIsValid(downloadPath, download.md5);
-        if (!fileValid && !download.isRetry) {
+        try {
+            let downloadPage = `https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${download.nexus_file_id}&game_id=110&source=FileExpander`;
+            log.verbose("Navigating to download page", {page: downloadPage});
+            await page.goto(downloadPage, {waitUntil: 'load'});
+            log.verbose("Waiting for download link to be available");
+            await page.waitForFunction(`!!document.getElementById("dl_link")`);
+            log.verbose("Got download link element");
+            let downloadLink = await page.$eval("#dl_link", e => e.value);
+            log.verbose("Download link", {link: downloadLink});
+            let downloadPath = await downloadFile(downloadLink, download.file_name, multibar, totalBar, totalDownloaded);
+            let fileValid = await fileIsValid(downloadPath, download.md5);
+            if (!fileValid && !download.isRetry) {
+                download.isRetry = true;
+                downloads.push(download);
+            } else if (!fileValid && download.isRetry) {
+                log.error("This file has failed download twice. Maybe it's broken?", {file: download})
+            } else {
+                log.verbose("File downloaded", {file: download.name});
+                totalDownloaded += Number(download.file_size) / 1024 / 1024;
+                totalBar.update(totalDownloaded.toFixed(2), {filename: "Total"})
+            }
+        } catch (e) {
+            log.error("Download error has occurred, adding to retry list", {error: e});
             download.isRetry = true;
-            downloads.unshift(download);
-        } else if (!fileValid && download.isRetry) {
-            log.error("This file has failed download twice. Maybe it's broken?", {file: download})
-        } else {
-            log.verbose("File downloaded", {file: download.name});
-            totalDownloaded += Number(download.file_size) / 1024 / 1024;
-            totalBar.update(totalDownloaded.toFixed(2), {filename: "Total"})
+            downloads.push(download);
         }
     }
     browser.close();
