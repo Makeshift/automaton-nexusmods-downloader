@@ -153,6 +153,7 @@ async function downloadMods(downloads, cookies) {
     });
     const totalBar = multibar.create((totalDownloadsSize / 1024 / 1024).toFixed(2), 0);
     let totalDownloaded = 0;
+    let failedDownloads = [];
     for (let download of downloads) {
         try {
             let downloadPage = `https://www.nexusmods.com/Core/Libs/Common/Widgets/DownloadPopUp?id=${download.nexus_file_id}&game_id=110&source=FileExpander`;
@@ -169,19 +170,25 @@ async function downloadMods(downloads, cookies) {
                 download.isRetry = true;
                 downloads.push(download);
             } else if (!fileValid && download.isRetry) {
-                log.error("This file has failed download twice. Maybe it's broken?", {file: download})
+                log.error("This file has failed download twice. Maybe it's broken?", {file: download.file_name})
             } else {
                 log.verbose("File downloaded", {file: download.name});
                 totalDownloaded += Number(download.file_size) / 1024 / 1024;
                 totalBar.update(totalDownloaded.toFixed(2), {filename: "Total"})
             }
         } catch (e) {
-            log.error("Download error has occurred, adding to retry list", {error: e});
-            download.isRetry = true;
-            downloads.push(download);
+            if (!download.isRetry) {
+                log.error("Download error has occurred, adding to retry list", {error: e});
+                download.isRetry = true;
+                downloads.push(download);
+            } else {
+                log.error("This file has failed download twice. Maybe it's broken?", {file: download.file_name});
+                failedDownloads.push(download);
+            }
         }
     }
     browser.close();
+    return failedDownloads;
 }
 
 async function login() {
@@ -206,8 +213,17 @@ async function go() {
     let downloads = await extractAutoFile();
     downloads = await checkDownloads(downloads);
     let cookies = config.get("cookie") ? JSON.parse(config.get("cookie")) : await login();
-    await downloadMods(downloads, cookies);
-    log.info("All done!")
+    let failedDownloads = await downloadMods(downloads, cookies);
+    if (failedDownloads.length > 0) {
+        let cleanFailedDownloads = failedDownloads.map(d => {
+            delete d.installation_parameters;
+            return d;
+        });
+        log.error("The following mods failed to download and should be investigated manually.", {mods: cleanFailedDownloads});
+        process.exit(1);
+    }
+    log.info("All done!");
+    process.exit(0)
 }
 
 go();
