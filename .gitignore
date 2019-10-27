@@ -1,7 +1,8 @@
 .idea
 downloads
 unpacked
-US 4.0.6 hf 1 (Keyboard) - LD Hotfix 1.auto
+*.auto
+fixed
 package-lock.json
 # Logs
 logs

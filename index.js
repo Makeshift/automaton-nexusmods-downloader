@@ -212,15 +212,17 @@ async function login() {
 async function go() {
     let downloads = await extractAutoFile();
     downloads = await checkDownloads(downloads);
-    let cookies = config.get("cookie") ? JSON.parse(config.get("cookie")) : await login();
-    let failedDownloads = await downloadMods(downloads, cookies);
-    if (failedDownloads.length > 0) {
-        let cleanFailedDownloads = failedDownloads.map(d => {
-            delete d.installation_parameters;
-            return d;
-        });
-        log.error("The following mods failed to download and should be investigated manually.", {mods: cleanFailedDownloads});
-        process.exit(1);
+    if (downloads.length > 0) {
+        let cookies = config.get("cookie") ? JSON.parse(config.get("cookie")) : await login();
+        let failedDownloads = await downloadMods(downloads, cookies);
+        if (failedDownloads.length > 0) {
+            let cleanFailedDownloads = failedDownloads.map(d => {
+                delete d.installation_parameters;
+                return d;
+            });
+            log.error("The following mods failed to download and should be investigated manually.", {mods: cleanFailedDownloads});
+            process.exit(1);
+        }
     }
     log.info("All done!");
     process.exit(0)
